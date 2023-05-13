@@ -1,0 +1,8 @@
+# Build-generated files
+.bloop
+.bsp
+.metals
+out/
+
+# IDE-generated files
+.vscode
