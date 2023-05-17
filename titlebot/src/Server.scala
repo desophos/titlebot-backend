@@ -6,6 +6,7 @@ import org.http4s.*
 import org.http4s.dsl.io.*
 import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.server.middleware.{Logger => ServerLogger}
 import org.http4s.server.middleware.CORS
 import org.http4s.server.middleware.ErrorAction
 import org.http4s.server.middleware.ErrorHandling
@@ -14,9 +15,9 @@ import scribe.cats.{io => log}
 
 object Server {
   def run = {
-    val addCors = CORS.policy.withAllowOriginAll.apply[IO, IO]
+    val serverCors = CORS.policy.withAllowOriginAll.apply[IO, IO]
 
-    def addErrorLogging(app: Http[IO, IO]) =
+    def serverErrorLogging(app: Http[IO, IO]) =
       ErrorHandling.Recover.total(
         ErrorAction.log(
           app,
@@ -25,18 +26,21 @@ object Server {
         )
       )
 
-    val addHttpLogging = Logger.httpApp(
+    val serverHttpLogging = ServerLogger.httpApp(
       logHeaders = true,
       logBody = true,
       redactHeadersWhen = _ => false,
       logAction = Some(log.debug(_)),
     )
 
+    val serverMiddleware =
+      (serverCors compose serverErrorLogging compose serverHttpLogging)
+
     for {
       client <- EmberClientBuilder.default[IO].build
       getTitle = GetTitle.impl(client)
       routes   = Routes.getTitleRoutes(getTitle).orNotFound
-      app = (addCors compose addErrorLogging compose addHttpLogging)(routes)
+      app      = serverMiddleware(routes)
 
       _ <- EmberServerBuilder
         .default[IO]
