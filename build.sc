@@ -10,6 +10,7 @@ object titlebot extends ScalaModule {
   def http4sV     = "0.23.18"
   def circeV      = "0.14.5"
   def scribeV     = "3.10.4"
+  def jsoupV      = "1.16.1"
 
   def scalacOptions = Seq(
     "-explain",
@@ -33,6 +34,7 @@ object titlebot extends ScalaModule {
     ivy"com.outr::scribe:$scribeV",
     ivy"com.outr::scribe-cats:$scribeV",
     ivy"com.outr::scribe-slf4j:$scribeV",
+    ivy"org.jsoup:jsoup:$jsoupV",
   )
 
   object test extends Tests with TestModule.Munit {
