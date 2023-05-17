@@ -5,6 +5,7 @@ import cats.effect.IO
 import cats.syntax.all.*
 import org.http4s.*
 import org.http4s.dsl.io.*
+import scribe.cats.{io => log}
 
 given EntityDecoder[IO, Uri] = EntityDecoder
   .text[IO]
@@ -25,8 +26,8 @@ object Routes {
         .as[Uri]
         .flatMap(getTitle.get)
         .flatMap {
-          case None        => BadRequest("Invalid URL")
-          case Some(title) => Ok(title)
+          case Left(e)      => log.error(e) *> BadRequest("Invalid URL")
+          case Right(title) => Ok(title)
         }
     }
 }
