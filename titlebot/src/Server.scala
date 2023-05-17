@@ -29,7 +29,7 @@ object Server {
       logHeaders = true,
       logBody = true,
       redactHeadersWhen = _ => false,
-      logAction = Some(IO.println),
+      logAction = Some(log.debug(_)),
     )
 
     for {
