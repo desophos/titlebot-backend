@@ -11,7 +11,7 @@ given EntityDecoder[IO, Uri] = EntityDecoder
   .flatMapR(s =>
     EitherT.fromEither(
       Uri
-        .fromString(s)
+        .fromString(s.strip)
         .leftMap(failure =>
           InvalidMessageBodyFailure(failure.details, failure.cause)
         )
