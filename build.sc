@@ -1,8 +1,15 @@
+import $ivy.`com.lihaoyi::mill-contrib-docker:$MILL_VERSION`
+import contrib.docker.DockerModule
 import mill._
 import mill.scalalib._
 import scalafmt._
 
-object titlebot extends ScalaModule {
+object titlebot extends ScalaModule with DockerModule {
+  object docker extends DockerConfig {
+    def tags      = List("titlebot-backend")
+    def baseImage = "ghcr.io/graalvm/jdk:ol8-java17"
+  }
+
   def scalaVersion = "3.2.2"
 
   def catsCoreV   = "2.8.0"
